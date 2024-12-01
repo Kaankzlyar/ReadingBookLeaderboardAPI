@@ -1,0 +1,6 @@
+@BookReadingAPI_HostAddress = http://localhost:5062
+
+GET {{BookReadingAPI_HostAddress}}/bookreadingAPI/
+Accept: application/json
+
+###
