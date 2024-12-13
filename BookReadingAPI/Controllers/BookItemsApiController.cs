@@ -53,6 +53,10 @@ public class BookItemsApiController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<BookItem>> PostBookItem(BookItem log)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);  // Hata varsa açıklamalarla birlikte geri dön
+        }
         var existingLog = await _context.BookItems.FirstOrDefaultAsync(u => u.UserName == log.UserName);
 
         if (existingLog != null)
