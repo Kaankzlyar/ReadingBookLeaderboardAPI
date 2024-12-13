@@ -21,17 +21,17 @@ public class BookItemsApiController : ControllerBase
     public async Task<ActionResult<IEnumerable<object>>> GetLeaderboard()
     {
         var leaderboard = await _context.BookItems
-            .OrderByDescending(u => u.TodayPageNumber)
-            .ThenByDescending(u => u.StreakNumber)
+            .OrderByDescending(u => u.TodayPages)
+            .ThenByDescending(u => u.Streak)
             .ToListAsync();
 
         var result = leaderboard.Select((item, index) => new
         {
             Rank = index + 1,
-            UserName = item.UserName,
+            UserName = item.Username,
             TotalPages = item.TotalPages,
-            TodayPages = item.TodayPageNumber,
-            Streak = item.StreakNumber > 0 ? $"🔥 {item.StreakNumber} days" : "-"
+            TodayPages = item.TodayPages,
+            Streak = item.Streak > 0 ? $"🔥 {item.Streak} days" : "-"
         }).ToList();
 
         return Ok(result);
@@ -57,34 +57,35 @@ public class BookItemsApiController : ControllerBase
         {
             return BadRequest(ModelState);  // Hata varsa açıklamalarla birlikte geri dön
         }
-        var existingLog = await _context.BookItems.FirstOrDefaultAsync(u => u.UserName == log.UserName);
+        var existingLog = await _context.BookItems.FirstOrDefaultAsync(u => u.Username == log.Username);
 
         if (existingLog != null)
         {
             if (existingLog.LastUpdate.Date == DateTime.UtcNow.Date)
             {
-                existingLog.TodayPageNumber += log.TodayPageNumber;
+                existingLog.TodayPages += log.TodayPages;
             }
             else
             {
                 if (existingLog.LastUpdate.Date == DateTime.UtcNow.AddDays(-1).Date)
                 {
-                    existingLog.StreakNumber++;
+                    existingLog.Streak++;
                 }
                 else
                 {
-                    existingLog.StreakNumber = 1;
+                    existingLog.Streak = 1;
                 }
-                existingLog.TodayPageNumber = log.TodayPageNumber;
+                existingLog.TodayPages = log.TodayPages;
             }
-            existingLog.TotalPages += log.TodayPageNumber;
+            existingLog.TotalPages = log.TotalPages;
             existingLog.LastUpdate = DateTime.UtcNow;
         }
         else
         {
             log.LastUpdate = DateTime.UtcNow;
-            log.StreakNumber = 1;
-            log.TotalPages = log.TodayPageNumber;
+            log.Streak = 1;
+            log.TotalPages = log.TotalPages;
+            log.TodayPages = log.TodayPages;
             _context.BookItems.Add(log);
         }
 
