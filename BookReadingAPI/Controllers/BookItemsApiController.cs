@@ -27,6 +27,7 @@ public class BookItemsApiController : ControllerBase
 
         var result = leaderboard.Select((item, index) => new
         {
+            Id = item.Id,
             Rank = index + 1,
             UserName = item.Username,
             TotalPages = item.TotalPages,
@@ -38,7 +39,7 @@ public class BookItemsApiController : ControllerBase
     }
 
     // GET: api/BookItems/5
-    [HttpGet("{id}")]
+    [HttpGet("GetBookItems{id}")]
     public async Task<ActionResult<BookItem>> GetBookItem(long id)
     {
         var bookItem = await _context.BookItems.FindAsync(id);
@@ -93,7 +94,7 @@ public class BookItemsApiController : ControllerBase
 
         return CreatedAtAction(nameof(GetBookItem), new { id = log.Id }, log);
     }
-    [HttpPut("{id}")]
+    [HttpPut("PutBookItems{id}")]
     public async Task<IActionResult> PutBookItem(long id, BookItem bookItem)
     {
         if (id != bookItem.Id)
@@ -124,9 +125,10 @@ public class BookItemsApiController : ControllerBase
 
 
     // DELETE: api/BookItems/5
-    [HttpDelete("{id}")]
+    [HttpDelete("DeleteBookItems{id}")]
     public async Task<IActionResult> DeleteBookItem(long id)
     {
+        Console.WriteLine($"Gelen ID: {id}"); 
         var bookItem = await _context.BookItems.FindAsync(id);
         if (bookItem == null)
         {
